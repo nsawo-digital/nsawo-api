@@ -1,7 +1,7 @@
 import { DigitalCurrency } from "src/digital-currency/digital-currency.entity";
 import { Tx } from "src/transaction/transaction.entity";
 import { User } from "src/users/users.entity";
-import { BeforeInsert, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 
 @Entity()
@@ -12,24 +12,26 @@ export class Wallet {
     @Column()
     name: string;
   
-    @Column()
+    @Column({ type: 'decimal', precision: 10, scale: 2 , default: 0.0})
     balance: number;
 
-    @Column()
-    password: string;
+    @CreateDateColumn()
+    createdAt: Date;
 
-    @Column()
-    picture: string;
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @ManyToOne(() => User, (user) => user.wallets)
+    @JoinColumn()
     user: User;
 
     @ManyToOne(() => DigitalCurrency, (digitalCurrency) => digitalCurrency.wallets)
+    @JoinColumn()
     digitalCurrency: DigitalCurrency;
 
     @OneToMany(() => Tx, (transaction) => transaction.wallet)
     txs: Tx[];
-  
+
     @BeforeInsert()
     generateId() {
       if (!this.id) {

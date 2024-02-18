@@ -6,24 +6,21 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WalletModule } from './wallet/wallet.module';
 import { DigitalCurrencyModule } from './digital-currency/digital-currency.module';
 import { TransactionModule } from './transaction/transaction.module';
-import { User } from './users/users.entity';
-import { Tx } from './transaction/transaction.entity';
-import { Wallet } from './wallet/wallet.entity';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import typeorm from './config/typeorm';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [UsersModule, 
-    TypeOrmModule.forRoot({
-    type: 'postgres',
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    entities: [User, Tx, Wallet],
-    synchronize: true, 
-    uuidExtension: 'pgcrypto', 
-  }), WalletModule, DigitalCurrencyModule, TransactionModule, AuthModule,],
+  imports: [UsersModule, JwtModule, 
+    ConfigModule.forRoot({
+      isGlobal: false,
+      load: [typeorm]
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => (configService.get('typeorm'))
+    }), WalletModule, DigitalCurrencyModule, TransactionModule, ],
   controllers: [AppController],
   providers: [AppService],
 })

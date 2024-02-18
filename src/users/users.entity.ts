@@ -1,6 +1,6 @@
 import { Tx } from "src/transaction/transaction.entity";
 import { Wallet } from "src/wallet/wallet.entity";
-import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 
 @Entity()
@@ -9,7 +9,7 @@ export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column()
+    @Column({unique: true})
     username: string;
   
     @Column()
@@ -18,15 +18,23 @@ export class User {
     @Column()
     password: string;
 
-    @Column()
+    @Column({nullable: true})
     picture: string;
+
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
+
 
     @OneToMany(() => Wallet, (wallet) => wallet.user)
     wallets: Wallet[];
 
     @OneToMany(() => Tx, (transaction) => transaction.user)
     txs: Tx[];
-
+    
     //generate a uuid for user before inserting a record
     @BeforeInsert()
     generateId() {

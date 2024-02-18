@@ -11,17 +11,17 @@ export class DigitalCurrency {
     name: string;
   
     @Column()
-    balance: number;
+    abbreviation: string;
 
-    @Column()
-    password: string;
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
+    worthInDollars: number;
 
-    @Column()
+    @Column({nullable: true})
     picture: string;
 
     @OneToMany(() => Wallet, (wallet) => wallet.digitalCurrency)
     wallets: Wallet[];
-  
+
     @BeforeInsert()
     generateId() {
       if (!this.id) {

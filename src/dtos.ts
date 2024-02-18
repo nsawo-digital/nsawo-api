@@ -5,3 +5,7 @@ export class SignInDto{
 
     password: string;
 }
+
+export class CreateWalletDTO {
+    name: string;
+}
