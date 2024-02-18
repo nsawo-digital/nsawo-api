@@ -1,8 +1,8 @@
+const { uuidv4 } = require ("uuid");
 import { DigitalCurrency } from "src/digital-currency/digital-currency.entity";
 import { Tx } from "src/transaction/transaction.entity";
 import { User } from "src/users/users.entity";
-import { BeforeInsert, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
-import { v4 as uuidv4 } from "uuid";
+import { BeforeInsert, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Wallet {

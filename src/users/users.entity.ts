@@ -21,7 +21,6 @@ export class User {
     @Column({nullable: true})
     picture: string;
 
-
     @CreateDateColumn()
     createdAt: Date;
 

@@ -5,6 +5,7 @@ import { DigitalCurrency } from './digital-currency.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([DigitalCurrency])],
+  exports: [TypeOrmModule],
   providers: [DigitalCurrencyService]
 })
 export class DigitalCurrencyModule {}

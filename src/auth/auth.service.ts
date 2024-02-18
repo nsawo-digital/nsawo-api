@@ -1,22 +1,27 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/users.entity';
 import { UsersService } from 'src/users/users.service';
-import { PasswordUtil } from 'src/utils/password.util';
+import { comparePasswords } from 'src/utils/password.util';
 
 @Injectable()
 export class AuthService {
     constructor(
+        @Inject(UsersService)
         private usersService: UsersService,
         private jwtService: JwtService,
-        private passwordUtil: PasswordUtil,
         ) {}
 
     async signIn(username: string, password: string): Promise<{ user: User, access_token: string}> {
-        const user = await this.usersService.findOne(username);
+        const user = await this.usersService.findByUserName(username);
 
-        if (await this.passwordUtil.comparePasswords(password, user.password)) {
-          throw new UnauthorizedException();
+        if (!user) {
+          throw new UnauthorizedException("Wrong Username");
+        }
+
+
+        if (!comparePasswords(password, user.password)) {
+          throw new UnauthorizedException("Wrong password");
         }
         
         const payload = { sub: user.id, username: user.username };

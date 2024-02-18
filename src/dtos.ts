@@ -1,3 +1,4 @@
+import { isEmail, isNotEmpty } from "class-validator";
 
 export class SignInDto{
 
@@ -8,4 +9,18 @@ export class SignInDto{
 
 export class CreateWalletDTO {
     name: string;
+}
+
+export class TransactDTO {
+    amount: number
+    password: string
+}
+
+export class registerUserDTO {
+    
+    username: string;
+
+    email: string;
+
+    password: string;
 }

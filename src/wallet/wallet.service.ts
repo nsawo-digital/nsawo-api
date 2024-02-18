@@ -1,41 +1,27 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wallet } from './wallet.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/users.entity';
 import { TransactionService } from 'src/transaction/transaction.service';
-import { PasswordUtil } from 'src/utils/password.util';
+import { comparePasswords } from 'src/utils/password.util';
 
 @Injectable()
 export class WalletService {
     constructor(
         @InjectRepository(Wallet)
-        @InjectRepository(User)
+        @Inject(TransactionService)
         private walletRepository: Repository<Wallet>,
-        private usersRepository: Repository<User>,
         private transactionService: TransactionService,
-        private passwordUtil: PasswordUtil,
     ) {}
 
-    async findForUser(userId: string): Promise<Wallet[]> {
-        const user =  await this.usersRepository.findOne({where: {id: userId}, relations: {wallets: true}});
-
-        if(!user){
-            throw new NotFoundException("User Not Found");
-        }
-
-        return user.wallets;
-    }
-
     async findOne(id: string): Promise<Wallet> {
-        return this.walletRepository.findOneBy({ id });
+        return this.walletRepository.findOne({ where: {id: id} , relations: {
+            txs: true, digitalCurrency: true,
+        }});
     }
 
-    async create(name: string, userId: string): Promise<Wallet> {
-        const user = await this.usersRepository.findOneBy({id: userId})
-        if(!user){
-            throw new NotFoundException("User not found");
-        }
+    async create(name: string, user: User): Promise<Wallet> {
 
         let wallet = this.walletRepository.create({
             name: name,
@@ -81,7 +67,7 @@ export class WalletService {
             throw new NotFoundException("Wallet Not found")
         }
 
-        if(!this.passwordUtil.comparePasswords(password, wallet.user.password)){
+        if(!comparePasswords(password, wallet.user.password)){
             throw new BadRequestException("The 2 passwords don't match");
         }
 
