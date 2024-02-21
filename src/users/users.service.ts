@@ -1,18 +1,22 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException, NotImplementedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './users.entity';
 import { Repository } from 'typeorm';
 import { WalletService } from 'src/wallet/wallet.service';
 import { Wallet } from 'src/wallet/wallet.entity';
 import { hashPassword } from 'src/utils/password.util';
+import { AuthService } from 'src/auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
         @Inject(WalletService)
+        @Inject(JwtService)
         private userRepository: Repository<User>,
         private walletService: WalletService,
+        private jwtService: JwtService,
     ) {}
 
     async findAll(): Promise<User[]> {
@@ -27,13 +31,24 @@ export class UsersService {
         return this.userRepository.findOne({where: {username: userName}});
     }
 
-    async create(user: User): Promise<User> {
-        const userWithSameUserNameExists = this.userRepository.exists({where: {username: user.username}})
+    async create(user: User): Promise<{}> {
+        const userWithSameUserNameExists = await this.userRepository.exists({where: {username: user.username}})
         if(userWithSameUserNameExists){
             throw new ConflictException("Username already taken");
         }
+        //const passwordBeforeHash = user.password
         user.password = await hashPassword(user.password)
-        return this.userRepository.save(user);
+
+        const savedUser = await this.userRepository.save(user);
+        if(!savedUser){
+            throw new NotImplementedException("Failed to save to Database, Please try again and watch your data")
+        }
+                
+        const payload = { sub: user.id, username: user.username };
+        return {
+            user: user,
+            access_token: await this.jwtService.signAsync(payload),
+        };
     }
 
     async createWallet(name: string, userId: string): Promise<Wallet> {

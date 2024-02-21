@@ -16,11 +16,12 @@ export class AuthService {
         const user = await this.usersService.findByUserName(username);
 
         if (!user) {
-          throw new UnauthorizedException("Wrong Username");
+          throw new UnauthorizedException("Wrong Username")
         }
 
+        const passwordMatches = await comparePasswords(password, user.password)
 
-        if (!comparePasswords(password, user.password)) {
+        if (!passwordMatches) {
           throw new UnauthorizedException("Wrong password");
         }
         

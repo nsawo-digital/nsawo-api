@@ -2,11 +2,13 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestj
 import { UsersService } from './users.service';
 import { CreateWalletDTO, registerUserDTO } from 'src/dtos';
 import { User } from './users.entity';
+import { Public } from 'src/auth/auth.guard';
 
 @Controller('user')
 export class UsersController {
     constructor(public usersService: UsersService) {}
 
+    @Public()//custom decorator to prevent jwt checking
     @HttpCode(HttpStatus.OK)
     @Post()
     register(@Body() registerUserDTO: registerUserDTO){
