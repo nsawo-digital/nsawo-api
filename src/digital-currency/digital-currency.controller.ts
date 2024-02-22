@@ -6,6 +6,7 @@ import { Public } from 'src/auth/auth.guard';
 export class DigitalCurrencyController {
     constructor (private digitalCurrencyService: DigitalCurrencyService) {}
 
+    //@Public()
     @Get()
     getAll(){
         return this.digitalCurrencyService.getAll()

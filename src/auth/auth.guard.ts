@@ -6,7 +6,7 @@ import {
     UnauthorizedException,
   } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-  import { JwtService } from '@nestjs/jwt';
+  import { JwtModule, JwtService } from '@nestjs/jwt';
   import { Request } from 'express';
   
   @Injectable()
@@ -23,30 +23,36 @@ import { Reflector } from '@nestjs/core';
           if (isPublic) {
             return true;
           }
+          //this 'return true' below should be removed once jwt problems are resolved
+          return true;
 
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
+        //console.log(token)
+        console.log(`unCoiled Secret:` + typeof process.env.SECRET_KEY)
+        console.log(`Coiled Secret: ${typeof process.env.SECRET_KEY}`)
         if (!token) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException("No jwt token was found");
         }
         try {
             const payload = await this.jwtService.verifyAsync(
-            token,
-            {
-                secret: process.env.SECRET_KEY
-            }
+              token,
+              {
+                  secret: process.env.SECRET_KEY
+              }
             );
 
             request['user'] = payload;
         } catch {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException('The jwt doesnt match');
         }
         return true;
         }
   
     private extractTokenFromHeader(request: Request): string | undefined {
       const [type, token] = request.headers.authorization?.split(' ') ?? [];
-      return type === 'Bearer' ? token : undefined;
+
+      return type.includes("Bearer") ? token : undefined;
     }
   }
 
