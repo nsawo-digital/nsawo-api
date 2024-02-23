@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 import { WalletService } from 'src/wallet/wallet.service';
 import { Wallet } from 'src/wallet/wallet.entity';
 import { hashPassword } from 'src/utils/password.util';
-import { AuthService } from 'src/auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { DigitalCurrencyService } from 'src/digital-currency/digital-currency.service';
 
 @Injectable()
 export class UsersService {
@@ -14,9 +14,11 @@ export class UsersService {
         @InjectRepository(User)
         @Inject(WalletService)
         @Inject(JwtService)
+        @Inject(DigitalCurrencyService)
         private userRepository: Repository<User>,
         private walletService: WalletService,
         private jwtService: JwtService,
+        private digitalCurrencyService: DigitalCurrencyService,
     ) {}
 
     async findAll(): Promise<User[]> {
@@ -51,21 +53,32 @@ export class UsersService {
         };
     }
 
-    async createWallet(name: string, userId: string): Promise<Wallet> {
-        const user = await this.userRepository.findOneBy({id: userId})
+    async wallets(userId: string): Promise<Wallet[]>{
+        return this.walletService.findByUserId(userId);
+    }
+
+    async createWallet(name: string, userId: string, currencyId: string): Promise<Wallet> {
+
+        const user = await this.userRepository.findOne({where: {id: userId}})
         if(!user){
             throw new NotFoundException("User not found");
         }
+        console.log(user)
 
-        return this.walletService.create(name, user)
+        const digitalCurrency = await this.digitalCurrencyService.findOne(currencyId)
+        if(!digitalCurrency){
+            throw new NotFoundException("Digital currency not found");
+        }
+
+        return this.walletService.create(name, user, digitalCurrency)
     }
     
     async update(id: string, updateUser: User): Promise<User> {
-    await this.userRepository.update(id, updateUser);
-    return this.userRepository.findOneBy({ id });
+        await this.userRepository.update(id, updateUser);
+        return this.userRepository.findOneBy({ id });
     }
 
     async remove(id: number): Promise<void> {
-    await this.userRepository.delete(id);
+        await this.userRepository.delete(id);
     }
 }

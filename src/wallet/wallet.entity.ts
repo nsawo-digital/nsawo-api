@@ -25,7 +25,7 @@ export class Wallet {
     @JoinColumn()
     user: User;
 
-    @ManyToOne(() => DigitalCurrency, (digitalCurrency) => digitalCurrency.wallets)
+    @ManyToOne(() => DigitalCurrency, (digitalCurrency) => digitalCurrency.wallets, {eager: true})
     @JoinColumn()
     digitalCurrency: DigitalCurrency;
 

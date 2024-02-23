@@ -14,7 +14,11 @@ export class DigitalCurrencyService {
         return this.digitalCurrencyRepository.find()
     }
 
-    async create(item: any){
+    async findOne(id: string){
+        return this.digitalCurrencyRepository.findOne({where: {id: id}})
+    }
+
+    async create(item: DigitalCurrency){
         return this.digitalCurrencyRepository.create(item)
     }
 

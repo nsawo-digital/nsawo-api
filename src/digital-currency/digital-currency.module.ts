@@ -6,7 +6,7 @@ import { DigitalCurrencyController } from './digital-currency.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([DigitalCurrency])],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, DigitalCurrencyService],
   providers: [DigitalCurrencyService],
   controllers: [DigitalCurrencyController]
 })

@@ -9,19 +9,19 @@ export class WalletController {
         ) {}
 
     @Get(':id')
-    getWallet(@Param(':id') id: string){
+    getWallet(@Param('id') id: string){
         return this.walletService.findOne(id);
     }
 
     @HttpCode(HttpStatus.OK)
     @Post('/deposit/:id')
-    deposit(@Body() transactDTO: TransactDTO, @Param(':id') id: string){
+    deposit(@Body() transactDTO: TransactDTO, @Param('id') id: string){
         return this.walletService.deposit(id, transactDTO.amount)
     }
 
     @HttpCode(HttpStatus.OK)
     @Post('/withdraw/:id')
-    withdraw(@Body() transactDTO: TransactDTO, @Param(':id') id: string){
+    withdraw(@Body() transactDTO: TransactDTO, @Param('id') id: string){
         return this.walletService.withdraw(id, transactDTO.amount, transactDTO.password)
     }
 

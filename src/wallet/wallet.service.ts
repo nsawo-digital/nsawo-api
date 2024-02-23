@@ -1,10 +1,11 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, NotImplementedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wallet } from './wallet.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/users.entity';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { comparePasswords } from 'src/utils/password.util';
+import { DigitalCurrency } from 'src/digital-currency/digital-currency.entity';
 
 @Injectable()
 export class WalletService {
@@ -21,12 +22,19 @@ export class WalletService {
         }});
     }
 
-    async create(name: string, user: User): Promise<Wallet> {
+    async findByUserId(userId: string): Promise<Wallet[]> {
+        return this.walletRepository.find({where: {user: {id: userId}}})
+    }
 
-        let wallet = this.walletRepository.create({
+    async create(name: string, user: User, digitalCurrency: DigitalCurrency): Promise<Wallet> {
+
+        let wallet = this.walletRepository.save({
             name: name,
             user: user,
+            digitalCurrency: digitalCurrency,
         })
+
+        if(!wallet) throw new NotImplementedException("Failed to store wallet to database")
 
         return wallet;
     }

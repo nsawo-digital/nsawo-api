@@ -9,6 +9,7 @@ export class SignInDto{
 
 export class CreateWalletDTO {
     name: string;
+    currencyId: string;
 }
 
 export class TransactDTO {
