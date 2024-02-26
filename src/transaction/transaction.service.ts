@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/users/users.entity';
 import { Wallet } from 'src/wallet/wallet.entity';
 import { Tx } from './transaction.entity';
 
@@ -14,7 +13,7 @@ export class TransactionService {
 
     async deposit(wallet: Wallet, amount: number) {
 
-        const tx = this.txRepository.create({
+        const tx = this.txRepository.save({
             amount: amount,
             wallet: wallet,
             user: wallet.user,
@@ -31,7 +30,7 @@ export class TransactionService {
     
     async withdraw(wallet: Wallet, amount: number) {
 
-        const tx = this.txRepository.create({
+        const tx = this.txRepository.save({
             amount: amount,
             wallet: wallet,
             user: wallet.user,
@@ -45,4 +44,13 @@ export class TransactionService {
 
         return tx;
     }
+
+    async getByUser(userId: string, limit: number, offset: number): Promise<Tx[]>{
+        return this.txRepository.find({where: {user: {id: userId}}, take: limit, skip: offset, order: {createdAt: 'DESC'}})
+    }
+
+    async getByWallet(walletId: string, limit: number, offset: number): Promise<Tx[]>{
+        return this.txRepository.find({where: {wallet: {id: walletId}}, order: {createdAt: 'DESC'}})
+    }
+
 }

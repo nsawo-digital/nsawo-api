@@ -6,6 +6,7 @@ import { User } from 'src/users/users.entity';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { comparePasswords } from 'src/utils/password.util';
 import { DigitalCurrency } from 'src/digital-currency/digital-currency.entity';
+import { Tx } from 'src/transaction/transaction.entity';
 
 @Injectable()
 export class WalletService {
@@ -18,7 +19,7 @@ export class WalletService {
 
     async findOne(id: string): Promise<Wallet> {
         return this.walletRepository.findOne({ where: {id: id} , relations: {
-            txs: true, digitalCurrency: true,
+            txs: true,
         }});
     }
 
@@ -57,34 +58,41 @@ export class WalletService {
     }
 
     async deposit(id: string, amount: number): Promise<Wallet> {
-        let wallet = await this.walletRepository.findOneBy({id});
+        let wallet = await this.walletRepository.findOne({where: {id: id}});
         if(!wallet){
             throw new NotFoundException("Wallet Not found")
         }
 
-        wallet.balance += this.convertToCrypto(amount, wallet);
+        const newBalance = Number(wallet.balance) + Number(amount);
+        wallet.balance = newBalance;
 
-        this.transactionService.deposit(wallet, amount);
+        await this.transactionService.deposit(wallet, amount);
 
         return this.walletRepository.save(wallet);
     }
 
     async withdraw(id: string, amount: number, password: string): Promise<Wallet>{
-        let wallet = await this.walletRepository.findOneBy({id});
+        let wallet = await this.walletRepository.findOne({where: {id: id}, relations: {user: true}});
         if(!wallet){
             throw new NotFoundException("Wallet Not found")
         }
 
-        if(!comparePasswords(password, wallet.user.password)){
-            throw new BadRequestException("The 2 passwords don't match");
+        let authenticated = await comparePasswords(password, wallet.user.password)
+        let hasEnoughBalance = (Number(wallet.balance) >= Number(amount))
+
+        if(!authenticated){
+            throw new BadRequestException("Wrong password provided");
+        }
+        if(!hasEnoughBalance){
+            throw new NotImplementedException('Insufficient balance')
         }
 
-        wallet.balance -= this.convertToCrypto(amount, wallet)
+        wallet.balance = (Number(wallet.balance) - Number(amount));
 
         this.transactionService.withdraw(wallet, amount);
+        console.log('Balance: ' + wallet.balance);
 
         return this.walletRepository.save(wallet)
-
     }
 
     async remove(id: number): Promise<void> {
