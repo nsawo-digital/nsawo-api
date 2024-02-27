@@ -27,7 +27,7 @@ import { DigitalCurrency } from './digital-currency/digital-currency.entity';
       password: configService.get('DB_PASSWORD'),
       database: configService.get('DB_NAME'),
       entities: [User, Wallet, Tx, DigitalCurrency],
-      sslmode: 'require',
+      ssl: { rejectUnauthorized: false },
       synchronize: false,
     }),
     inject: [ConfigService],
