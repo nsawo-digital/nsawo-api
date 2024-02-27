@@ -19,6 +19,7 @@ import { DigitalCurrency } from './digital-currency/digital-currency.entity';
     ConfigModule.forRoot({ isGlobal: true}),
     TypeOrmModule.forRootAsync({ imports: [ConfigModule],
     useFactory: (configService: ConfigService) => ({
+      url: configService.get('DATABASE_URL'),
       type: 'postgres',
       host: configService.get('DB_HOST'),
       port: configService.get<number>('DB_PORT'),
