@@ -29,7 +29,7 @@ export class WalletService {
 
     async create(name: string, user: User, digitalCurrency: DigitalCurrency): Promise<Wallet> {
 
-        const wallet = await this.walletRepository.save({
+        const wallet = await this.walletRepository.create({
             name: name,
             user: user,
             digitalCurrency: digitalCurrency,
