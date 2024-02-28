@@ -6,6 +6,7 @@ import { User } from 'src/users/users.entity';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { comparePasswords } from 'src/utils/password.util';
 import { DigitalCurrency } from 'src/digital-currency/digital-currency.entity';
+import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class WalletService {
@@ -28,7 +29,9 @@ export class WalletService {
 
     async create(name: string, user: User, digitalCurrency: DigitalCurrency): Promise<Wallet> {
 
-        const wallet = this.walletRepository.create({
+
+        const wallet = await this.walletRepository.save({
+            id: uuidv4(),
             name: name,
             user: user,
             digitalCurrency: digitalCurrency,
