@@ -13,6 +13,7 @@ const config = {
     database: `${process.env.DB_NAME}`,
     entities: ['./src/**/*.entity.ts'],
     migrations: ["src/migrations/*{.ts,.js}"],
+    ssl: { rejectUnauthorized: false },
     autoLoadEntities: true,
     synchronize: false,
 }
