@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Wallet } from 'src/wallet/wallet.entity';
 import { Tx } from './transaction.entity';
+import { v4 as uuidv4 } from "uuid";
+
 
 @Injectable()
 export class TransactionService {
@@ -14,6 +16,7 @@ export class TransactionService {
     async deposit(wallet: Wallet, amount: number) {
 
         const tx = this.txRepository.save({
+            id: uuidv4(),
             amount: amount,
             wallet: wallet,
             user: wallet.user,
@@ -31,6 +34,7 @@ export class TransactionService {
     async withdraw(wallet: Wallet, amount: number) {
 
         const tx = this.txRepository.save({
+            id: uuidv4(),
             amount: amount,
             wallet: wallet,
             user: wallet.user,
