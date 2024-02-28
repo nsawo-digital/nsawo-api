@@ -1,4 +1,4 @@
-const { uuidv4 } = require ("uuid");
+import { v4 as uuidv4 } from "uuid";
 import { DigitalCurrency } from "src/digital-currency/digital-currency.entity";
 import { Tx } from "src/transaction/transaction.entity";
 import { User } from "src/users/users.entity";
