@@ -6,7 +6,6 @@ import { User } from 'src/users/users.entity';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { comparePasswords } from 'src/utils/password.util';
 import { DigitalCurrency } from 'src/digital-currency/digital-currency.entity';
-import { Tx } from 'src/transaction/transaction.entity';
 
 @Injectable()
 export class WalletService {
@@ -29,7 +28,7 @@ export class WalletService {
 
     async create(name: string, user: User, digitalCurrency: DigitalCurrency): Promise<Wallet> {
 
-        const wallet = await this.walletRepository.create({
+        const wallet = this.walletRepository.create({
             name: name,
             user: user,
             digitalCurrency: digitalCurrency,
